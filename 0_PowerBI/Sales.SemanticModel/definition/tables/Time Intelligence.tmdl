@@ -1,0 +1,54 @@
+table 'Time Intelligence'
+	lineageTag: 1262bff4-a21d-41f5-8fd9-f5744a78618a
+
+	calculationGroup
+		precedence: 1
+
+		calculationItem TOTAL = SELECTEDMEASURE()
+
+		calculationItem 'Vorjahr (PY)' =
+				CALCULATE(
+				    SELECTEDMEASURE(),
+				    SAMEPERIODLASTYEAR('DimDate'[Date])
+				)
+
+		calculationItem 'YoY %' =
+				VAR AktuellerWert = SELECTEDMEASURE()
+				VAR VorjahresWert = CALCULATE(
+				    SELECTEDMEASURE(),
+				    SAMEPERIODLASTYEAR('DimDate'[Date])
+				)
+				RETURN
+				DIVIDE(AktuellerWert - VorjahresWert, VorjahresWert)
+
+			formatStringDefinition = "+0.0%;-0.0%;0.0%"
+
+		calculationItem MoM =
+				CALCULATE(
+				    SELECTEDMEASURE(),
+				    DATEADD('DimDate'[Date], -1, MONTH)
+				)
+
+		calculationItem 'MoM %' =
+				VAR AktuellerWert = SELECTEDMEASURE()
+				VAR VormonatsWert = CALCULATE(
+				    SELECTEDMEASURE(),
+				    DATEADD('DimDate'[Date], -1, MONTH)
+				)
+				RETURN
+				DIVIDE(AktuellerWert - VormonatsWert, VormonatsWert)
+
+			formatStringDefinition = "+0.0%;-0.0%;0.0%"
+
+	column Name
+		dataType: string
+		lineageTag: bfa27bd4-99a8-40a5-8e72-771f7cfba1a9
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+	column Ordinal
+		dataType: int64
+		isHidden
+		lineageTag: a5666557-b519-43a0-a6f4-e80f74c646d0
+		sourceColumn: Ordinal
+

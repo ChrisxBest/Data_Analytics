@@ -1,0 +1,122 @@
+table FactSales
+	lineageTag: 7fb2a25c-f355-487e-9a1e-4d6c0c7faed7
+
+	measure 'Total Sales' = SUM('FactSales'[Unit Price])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 21a11c90-d640-4297-bcd0-7f6132a497a1
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Total Cost' = SUM('FactSales'[Unit Cost])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 626b427a-98b4-401d-84d2-8ad425d51582
+
+		changedProperty = FormatString
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	measure 'Total Transactions' = COUNTROWS('FactSales')
+		formatString: #,0
+		lineageTag: 5dbebaef-e7bc-495c-8381-9c29e2b44159
+
+		changedProperty = FormatString
+
+	measure 'Total Profit' = [Total Sales]-[Total Cost]
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 61d0661b-ed12-4d15-b4d0-bc315a717184
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column ProductID
+		dataType: int64
+		formatString: 0
+		lineageTag: ee8790f7-b0c1-462c-9946-635dcfa5e06b
+		summarizeBy: none
+		sourceColumn: ProductID
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 95a89dc6-3469-48de-96de-0171dd0d508f
+		summarizeBy: none
+		sourceColumn: OrderDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column CustomerID
+		dataType: int64
+		formatString: 0
+		lineageTag: 3947020b-8383-4097-a676-9e60379f5406
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Units
+		dataType: int64
+		formatString: 0
+		lineageTag: 1a2c57b2-0325-44ad-8c49-02b9f7c3ed94
+		summarizeBy: sum
+		sourceColumn: Units
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unit Cost'
+		dataType: double
+		lineageTag: e6e67faa-3b5c-4638-ad63-b1447ac10fd3
+		summarizeBy: sum
+		sourceColumn: Unit Cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Unit Price'
+		dataType: double
+		lineageTag: da99af06-34f9-4042-8493-928b3aceb6d7
+		summarizeBy: sum
+		sourceColumn: Unit Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ShipDate
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4cfd7260-a253-4074-ac1b-1d7d5ed2e230
+		summarizeBy: none
+		sourceColumn: ShipDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition FactSales-d60fc7bc-6012-4611-875a-ec6540bff999 = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\LWTN Data Modeling\StudentFiles\Sales.csv"),[Delimiter=",", Columns=19, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductID", Int64.Type}, {"Date", type datetime}, {"CustomerID", Int64.Type}, {"CampaignID", Int64.Type}, {"Units", Int64.Type}, {"Product", type text}, {"Category", type text}, {"Segment", type text}, {"ManufacturerID", Int64.Type}, {"Manufacturer", type text}, {"Unit Cost", type number}, {"Unit Price", type number}, {"ZipCode", Int64.Type}, {"Email Name", type text}, {"City", type text}, {"State", type text}, {"Region", type text}, {"District", type text}, {"Country", type text}}),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Changed Type",{"ProductID", "Date", "CustomerID", "Units", "Unit Cost", "Unit Price"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Removed Other Columns", each true),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Filtered Rows",{"Date", "ProductID", "CustomerID", "Units", "Unit Cost", "Unit Price"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Reordered Columns",{{"Date", type date}}),
+				    #"Added Custom" = Table.AddColumn(#"Changed Type1", "ShipDate", each Date.AddDays([Date], 3)),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Added Custom",{{"ShipDate", type date}}),
+				    #"Reordered Columns1" = Table.ReorderColumns(#"Changed Type2",{"Date", "ShipDate", "ProductID", "CustomerID", "Units", "Unit Cost", "Unit Price"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Reordered Columns1",{{"Date", "OrderDate"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
