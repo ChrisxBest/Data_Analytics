@@ -1,0 +1,104 @@
+table DimDate
+	lineageTag: cdfe55ce-9314-4b1f-8b39-8959912a8c67
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: 270c6fb3-e903-4047-a4b4-3d9196effc13
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 896fec8c-fb54-4beb-b89a-4fb78278b0df
+		summarizeBy: sum
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: 8c9c5809-8769-4553-8453-94f7d399fa76
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Week Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 93b84717-1d35-476b-a34e-eec84297d958
+		summarizeBy: sum
+		sourceColumn: Week Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: e9285300-1357-40aa-8baa-f1994d18ae7a
+		summarizeBy: sum
+		sourceColumn: Month Number
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: ac4c2fb0-da53-40b4-8435-18ccdc7433d0
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Week'
+		dataType: string
+		lineageTag: df1360f9-8943-4393-acd1-e6dcaaf210b3
+		summarizeBy: none
+		sourceColumn: Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Day of Week Hierarchie'
+		lineageTag: 7589b65e-1f7f-4b87-b839-f7e8c81727e6
+
+		level 'Day of Week'
+			lineageTag: 654c25fd-4219-4a76-9373-7e421410d11b
+			column: 'Day of Week'
+
+	hierarchy 'Year Hierarchie'
+		lineageTag: ba842f89-2a42-48c5-8115-9649ac7a6b9c
+
+		level Year
+			lineageTag: 676f2fda-8707-4717-b9ad-1ce566206725
+			column: Year
+
+		level 'Month Number'
+			lineageTag: 3b094675-3d9d-4e2b-8b13-3b129b874956
+			column: 'Month Number'
+
+		level Month
+			lineageTag: 7fb48288-4c87-4784-b54a-77ad3f833259
+			column: Month
+
+	partition DimDate-33b9ef98-f4cf-4aa1-b4f5-466f8cc6c4b8 = m
+		mode: import
+		source =
+				let
+				    Source = Query1(#date(2011, 1, 1), #date(2022, 12, 31)),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Date", type date}, {"Year", Int64.Type}, {"Quarter", type text}, {"Week Number", Int64.Type}, {"Month Number", Int64.Type}, {"Month", type text}, {"Day of Week", type text}})
+				in
+				    #"Changed Type"
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

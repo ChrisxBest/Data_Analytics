@@ -1,0 +1,77 @@
+table DimProduct
+	lineageTag: a8bdcbae-cb4f-4d9b-807b-59da02232ad0
+
+	column ProductID
+		dataType: int64
+		formatString: 0
+		lineageTag: c18f62e1-3d84-48ce-be48-9b153c5c654a
+		summarizeBy: none
+		sourceColumn: ProductID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		lineageTag: 2577296d-6237-4507-b57b-41e44b127979
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column Manufacturer
+		dataType: string
+		lineageTag: 7c523188-7667-4d44-a2c1-0bbbf5a9c244
+		summarizeBy: none
+		sourceColumn: Manufacturer
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Unit Cost'
+		dataType: double
+		lineageTag: 385c0c04-7de2-498b-b888-8b87dc08a4f8
+		summarizeBy: sum
+		sourceColumn: Unit Cost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Unit Price'
+		dataType: double
+		lineageTag: 0e0b1c35-368a-49b2-93ca-b4c64649be3c
+		summarizeBy: sum
+		sourceColumn: Unit Price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CatSegID
+		dataType: int64
+		formatString: 0
+		lineageTag: b4b0c1ff-24bf-4d6b-8f1a-f7963ff60319
+		summarizeBy: none
+		sourceColumn: CatSegID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimProduct-e20ff92f-e8fa-4407-9286-02f8e4c45565 = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\LWTN Data Modeling\StudentFiles\Sales.csv"),[Delimiter=",", Columns=19, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductID", Int64.Type}, {"Date", type datetime}, {"CustomerID", Int64.Type}, {"CampaignID", Int64.Type}, {"Units", Int64.Type}, {"Product", type text}, {"Category", type text}, {"Segment", type text}, {"ManufacturerID", Int64.Type}, {"Manufacturer", type text}, {"Unit Cost", type number}, {"Unit Price", type number}, {"ZipCode", Int64.Type}, {"Email Name", type text}, {"City", type text}, {"State", type text}, {"Region", type text}, {"District", type text}, {"Country", type text}}),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Changed Type",{"ProductID", "Units", "Product", "Category", "Segment", "ManufacturerID", "Manufacturer", "Unit Cost", "Unit Price"}),
+				    #"Removed Duplicates" = Table.Distinct(#"Removed Other Columns"),
+				    #"Sorted Rows" = Table.Sort(#"Removed Duplicates",{{"ProductID", Order.Ascending}}),
+				    #"Merged Queries" = Table.NestedJoin(#"Sorted Rows", {"Category", "Segment"}, DimCatSeg, {"Category", "Segment"}, "DimCatSeg", JoinKind.LeftOuter),
+				    #"Expanded DimCatSeg" = Table.ExpandTableColumn(#"Merged Queries", "DimCatSeg", {"CatSegID"}, {"CatSegID"}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Expanded DimCatSeg",{"Category", "Segment", "Units", "ManufacturerID"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

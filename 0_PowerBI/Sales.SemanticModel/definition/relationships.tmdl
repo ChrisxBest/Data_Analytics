@@ -1,0 +1,37 @@
+relationship 2479e5c4-8057-4a50-a0ab-89d2bea0dfc2
+	fromColumn: FactSales.ProductID
+	toColumn: DimProduct.ProductID
+
+relationship 364a09dc-d218-43c3-8ce7-46326a3421a2
+	fromColumn: DimCustomer.ZipCode
+	toColumn: DimGeography.ZipCode
+
+relationship 1638dccb-4d30-4104-b23b-f7ad6d750583
+	fromColumn: DimProduct.CatSegID
+	toColumn: DimCatSeg.CatSegID
+
+relationship b61a0193-4966-453d-aade-9720af55b785
+	fromColumn: FactSales.CustomerID
+	toColumn: DimCustomer.CustomerID
+
+relationship e3851b2d-c47a-4a01-8eee-916455b83a14
+	fromColumn: FactBudget.CatSegID
+	toColumn: DimCatSeg.CatSegID
+
+relationship 889659f5-ff5c-46b1-83d4-c53da21b0331
+	fromColumn: FactBudget.Date
+	toColumn: DimDate.Date
+
+relationship 6b36ec28-958e-472c-8694-92c1f37a08ae
+	fromColumn: FactSales.OrderDate
+	toColumn: DimDate.Date
+
+relationship 4735a96d-dcc7-4f6d-8b6f-851ae0f1c260
+	fromColumn: FactAggSales.Date
+	toColumn: DimDate.Date
+
+relationship c74badf1-965b-4f5b-8aed-647e702bc0d5
+	isActive: false
+	fromColumn: FactSales.ShipDate
+	toColumn: DimDate.Date
+

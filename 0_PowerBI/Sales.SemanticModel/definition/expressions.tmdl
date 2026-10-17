@@ -1,0 +1,69 @@
+expression Query1 = ```
+		//Create Date Dimension
+		(StartDate as date, EndDate as date)=>
+		
+		let
+		    //Capture the date range from the parameters
+		    StartDate = #date(Date.Year(StartDate), Date.Month(StartDate), 
+		    Date.Day(StartDate)),
+		    EndDate = #date(Date.Year(EndDate), Date.Month(EndDate), 
+		    Date.Day(EndDate)),
+		
+		    //Get the number of dates that will be required for the table
+		    GetDateCount = Duration.Days(EndDate - StartDate),
+		
+		    //Take the count of dates and turn it into a list of dates
+		    GetDateList = List.Dates(StartDate, GetDateCount, 
+		    #duration(1,0,0,0)),
+		
+		    //Convert the list into a table
+		    DateListToTable = Table.FromList(GetDateList, 
+		    Splitter.SplitByNothing(), {"Date"}, null, ExtraValues.Error),
+		
+		    //Create various date attributes from the date column
+		    //Add Year Column
+		    YearNumber = Table.AddColumn(DateListToTable, "Year", 
+		    each Date.Year([Date])),
+		
+		    //Add Quarter Column
+		    QuarterNumber = Table.AddColumn(YearNumber , "Quarter", 
+		    each "Q" & Number.ToText(Date.QuarterOfYear([Date]))),
+		
+		    //Add Week Number Column
+		    WeekNumber= Table.AddColumn(QuarterNumber , "Week Number", 
+		    each Date.WeekOfYear([Date])),
+		
+		    //Add Month Number Column
+		    MonthNumber = Table.AddColumn(WeekNumber, "Month Number", 
+		    each Date.Month([Date])),
+		
+		    //Add Month Name Column
+		    MonthName = Table.AddColumn(MonthNumber , "Month", 
+		    each Date.ToText([Date],"MMMM")),
+		
+		    //Add Day of Week Column
+		    DayOfWeek = Table.AddColumn(MonthName , "Day of Week", 
+		    each Date.ToText([Date],"dddd"))
+		
+		in
+		    DayOfWeek
+		```
+	lineageTag: 1ea58553-5597-4c96-a9b1-f8cb98ca2879
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Function
+
+expression BudgetFact_Data =
+		let
+		    Source = Csv.Document(File.Contents("D:\LWTN Data Modeling\Student\VanArsdel Budget.csv"),[Delimiter=",", Columns=38, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}, {"Column5", type text}, {"Column6", type text}, {"Column7", type text}, {"Column8", type text}, {"Column9", type text}, {"Column10", type text}, {"Column11", type text}, {"Column12", type text}, {"Column13", type text}, {"Column14", type text}, {"Column15", type text}, {"Column16", type text}, {"Column17", type text}, {"Column18", type text}, {"Column19", type text}, {"Column20", type text}, {"Column21", type text}, {"Column22", type text}, {"Column23", type text}, {"Column24", type text}, {"Column25", type text}, {"Column26", type text}, {"Column27", type text}, {"Column28", type text}, {"Column29", type text}, {"Column30", type text}, {"Column31", type text}, {"Column32", type text}, {"Column33", type text}, {"Column34", type text}, {"Column35", type text}, {"Column36", type text}, {"Column37", type text}, {"Column38", type text}}),
+		    #"Removed Top Rows" = Table.Skip(#"Changed Type",3)
+		in
+		    #"Removed Top Rows"
+	lineageTag: 7a30bfe6-0217-44d9-8bbc-6bac37e2111c
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

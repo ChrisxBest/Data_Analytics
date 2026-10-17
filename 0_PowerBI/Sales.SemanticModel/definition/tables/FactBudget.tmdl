@@ -1,0 +1,72 @@
+table FactBudget
+	lineageTag: 9632f07d-2c29-4d1b-9fb1-befadbdc7b6e
+
+	column Scenario
+		dataType: string
+		lineageTag: 822adbf6-f41a-4c8b-9541-8b9c3c41ad1e
+		summarizeBy: none
+		sourceColumn: Scenario
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 594e596b-3724-40db-a249-ffba018a70ba
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Value
+		dataType: string
+		lineageTag: 37a70b59-7dad-4437-b06f-5e6ade8d95a5
+		summarizeBy: none
+		sourceColumn: Value
+
+		annotation SummarizationSetBy = Automatic
+
+	column CatSegID
+		dataType: int64
+		formatString: 0
+		lineageTag: d0389799-6f3c-47c1-af1d-5e890385c425
+		summarizeBy: none
+		sourceColumn: CatSegID
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactBudget-7fe68fae-569f-47a5-834e-691305940244 = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\LWTN Data Modeling\Student\VanArsdel Budget.csv"),[Delimiter=",", Columns=38, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}, {"Column5", type text}, {"Column6", type text}, {"Column7", type text}, {"Column8", type text}, {"Column9", type text}, {"Column10", type text}, {"Column11", type text}, {"Column12", type text}, {"Column13", type text}, {"Column14", type text}, {"Column15", type text}, {"Column16", type text}, {"Column17", type text}, {"Column18", type text}, {"Column19", type text}, {"Column20", type text}, {"Column21", type text}, {"Column22", type text}, {"Column23", type text}, {"Column24", type text}, {"Column25", type text}, {"Column26", type text}, {"Column27", type text}, {"Column28", type text}, {"Column29", type text}, {"Column30", type text}, {"Column31", type text}, {"Column32", type text}, {"Column33", type text}, {"Column34", type text}, {"Column35", type text}, {"Column36", type text}, {"Column37", type text}, {"Column38", type text}}),
+				    #"Removed Top Rows" = Table.Skip(#"Changed Type",3),
+				    #"Kept First Rows" = Table.FirstN(#"Removed Top Rows",3),
+				    #"Transposed Table" = Table.Transpose(#"Kept First Rows"),
+				    #"Added Custom" = Table.AddColumn(#"Transposed Table", "Budget Month", each try Date.From([Column3] & [Column2]) otherwise null),
+				    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Fully Combined Header", each if Text.Length([Column3]) > 3 then [Column3] else [Column1] & "~" & Date.ToText([Budget Month], "MM/dd/yy")),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Added Custom1",{"Fully Combined Header"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Removed Other Columns",{{"Fully Combined Header", type text}}),
+				    #"Transposed Table1" = Table.Transpose(#"Changed Type1"),
+				    #"Appended Query" = Table.Combine({#"Transposed Table1", BudgetFact_Data}),
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Appended Query", [PromoteAllScalars=true]),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Promoted Headers",{{"Category", type text}, {"Segment", type text}, {"Forecast~12/01/16", type text}, {"Forecast~11/01/16", type text}, {"Forecast~10/01/16", type text}, {"Forecast~09/01/16", type text}, {"Forecast~08/01/16", type text}, {"Forecast~07/01/16", type text}, {"Forecast~06/01/16", type text}, {"Forecast~05/01/16", type text}, {"Forecast~04/01/16", type text}, {"Forecast~03/01/16", type text}, {"Forecast~02/01/16", type text}, {"Forecast~01/01/16", type text}, {"Budget~12/01/16", type text}, {"Budget~11/01/16", type text}, {"Budget~10/01/16", type text}, {"Budget~09/01/16", type text}, {"Budget~08/01/16", type text}, {"Budget~07/01/16", type text}, {"Budget~06/01/16", type text}, {"Budget~05/01/16", type text}, {"Budget~04/01/16", type text}, {"Budget~03/01/16", type text}, {"Budget~02/01/16", type text}, {"Budget~01/01/16", type text}, {"Budget~12/01/15", type text}, {"Budget~11/01/15", type text}, {"Budget~10/01/15", type text}, {"Budget~09/01/15", type text}, {"Budget~08/01/15", type text}, {"Budget~07/01/15", type text}, {"Budget~06/01/15", type text}, {"Budget~05/01/15", type text}, {"Budget~04/01/15", type text}, {"Budget~03/01/15", type text}, {"Budget~02/01/15", type text}, {"Budget~01/01/15", type text}}),
+				    #"Removed Top Rows1" = Table.Skip(#"Changed Type2",3),
+				    #"Unpivoted Other Columns" = Table.UnpivotOtherColumns(#"Removed Top Rows1", {"Category", "Segment"}, "Attribute", "Value"),
+				    #"Split Column by Delimiter" = Table.SplitColumn(#"Unpivoted Other Columns", "Attribute", Splitter.SplitTextByDelimiter("~", QuoteStyle.Csv), {"Attribute.1", "Attribute.2"}),
+				    #"Changed Type3" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"Attribute.1", type text}, {"Attribute.2", type date}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type3",{{"Attribute.2", "Date"}, {"Attribute.1", "Scenario"}}),
+				    #"Merged Queries" = Table.NestedJoin(#"Renamed Columns", {"Category", "Segment"}, DimCatSeg, {"Category", "Segment"}, "DimCatSeg", JoinKind.LeftOuter),
+				    #"Expanded DimCatSeg" = Table.ExpandTableColumn(#"Merged Queries", "DimCatSeg", {"CatSegID"}, {"CatSegID"}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Expanded DimCatSeg",{"Category", "Segment"}),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Removed Columns",{"CatSegID", "Scenario", "Date", "Value"})
+				in
+				    #"Reordered Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
