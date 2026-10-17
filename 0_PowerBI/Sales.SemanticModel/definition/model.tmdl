@@ -24,6 +24,7 @@ ref table FactBudget
 ref table DimCatSeg
 ref table FactAggSales
 ref table 'Time Intelligence'
+ref table Parameter
 
 ref cultureInfo en-US
 

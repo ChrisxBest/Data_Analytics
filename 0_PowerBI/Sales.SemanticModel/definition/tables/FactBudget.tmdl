@@ -1,6 +1,10 @@
 table FactBudget
 	lineageTag: 9632f07d-2c29-4d1b-9fb1-befadbdc7b6e
 
+	measure 'Total Budget' = SUM(FactBudget[Value])
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: 18bf87a1-b47b-4a75-b9e5-eb6eb0acaecd
+
 	column Scenario
 		dataType: string
 		lineageTag: 822adbf6-f41a-4c8b-9541-8b9c3c41ad1e
@@ -21,12 +25,16 @@ table FactBudget
 		annotation UnderlyingDateTimeDataType = Date
 
 	column Value
-		dataType: string
+		dataType: double
 		lineageTag: 37a70b59-7dad-4437-b06f-5e6ade8d95a5
-		summarizeBy: none
+		summarizeBy: sum
 		sourceColumn: Value
 
+		changedProperty = DataType
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column CatSegID
 		dataType: int64
