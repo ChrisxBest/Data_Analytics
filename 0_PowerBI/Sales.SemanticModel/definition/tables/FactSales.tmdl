@@ -29,6 +29,17 @@ table FactSales
 
 		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
 
+	measure 'Total Sales (Ship Date)' =
+			
+			CALCULATE(
+			    [Total Sales],
+			    USERELATIONSHIP('DimDate'[Date], 'FactSales'[ShipDate])
+			)
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: 57e8396c-9b81-4579-afdc-fa04bf7bf235
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
 	column ProductID
 		dataType: int64
 		formatString: 0
