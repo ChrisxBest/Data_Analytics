@@ -1,2 +1,29 @@
+# Power BI local cache & user settings
 **/.pbi/localSettings.json
 **/.pbi/cache.abf
+
+# Credentials & local config
+.env
+.env.*
+*secret*
+*credentials*
+
+# SQL backups, database files & ETL logs
+*.bak
+*.bacpac
+*.dacpac
+*.mdf
+*.ldf
+*.ndf
+*.log
+
+# Local data dumps / exports (uncomment to exclude large raw data files)
+# *.csv
+# *.xlsx
+# *.parquet
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
