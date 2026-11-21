@@ -1,0 +1,68 @@
+table DimGeography
+	lineageTag: 8c21aac5-c04c-4f71-a714-9652be4783b6
+
+	column ZipCode
+		dataType: string
+		lineageTag: c42c8566-5ad3-4ac2-950a-4d7d6ab7043b
+		summarizeBy: none
+		sourceColumn: ZipCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 686d5695-917b-4d11-ac46-0dd3cc11389a
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: b869a79b-5f7e-4ff2-a192-5319f39481ce
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: d944dc6e-053a-4595-8e8b-50276accc366
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column District
+		dataType: string
+		lineageTag: 6bf30e21-5419-4918-9189-a6be751810eb
+		summarizeBy: none
+		sourceColumn: District
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 970c4a70-7696-4899-88d9-15f0d3c68589
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimGeography-174411f9-04f3-4b7f-9279-65c32fbd28d3 = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\LWTN Data Modeling\StudentFiles\Sales.csv"),[Delimiter=",", Columns=19, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductID", Int64.Type}, {"Date", type datetime}, {"CustomerID", Int64.Type}, {"CampaignID", Int64.Type}, {"Units", Int64.Type}, {"Product", type text}, {"Category", type text}, {"Segment", type text}, {"ManufacturerID", Int64.Type}, {"Manufacturer", type text}, {"Unit Cost", type number}, {"Unit Price", type number}, {"Email Name", type text}, {"City", type text}, {"State", type text}, {"Region", type text}, {"District", type text}, {"Country", type text}}),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Changed Type",{"ZipCode", "City", "State", "Region", "District", "Country"}),
+				    #"Removed Duplicates" = Table.Distinct(#"Removed Other Columns"),
+				    #"Sorted Rows" = Table.Sort(#"Removed Duplicates",{{"ZipCode", Order.Ascending}})
+				in
+				    #"Sorted Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

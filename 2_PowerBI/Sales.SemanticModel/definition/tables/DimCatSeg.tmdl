@@ -1,0 +1,50 @@
+table DimCatSeg
+	lineageTag: ede38335-0aa6-45e6-88f0-97a0ddc80613
+
+	column CatSegID
+		dataType: int64
+		formatString: 0
+		lineageTag: e547985c-dba7-4059-8793-d912d48e9a0f
+		summarizeBy: none
+		sourceColumn: CatSegID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 11c0ceca-ce8a-4ecd-8cb0-140cef73f318
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: 67eca64d-673a-4af4-ad72-fa30a03b4790
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimCatSeg-a1181c47-ae2d-4350-802c-6b1473ea1b3e = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\LWTN Data Modeling\StudentFiles\Sales.csv"),[Delimiter=",", Columns=19, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductID", Int64.Type}, {"Date", type datetime}, {"CustomerID", Int64.Type}, {"CampaignID", Int64.Type}, {"Units", Int64.Type}, {"Product", type text}, {"Category", type text}, {"Segment", type text}, {"ManufacturerID", Int64.Type}, {"Manufacturer", type text}, {"Unit Cost", type number}, {"Unit Price", type number}, {"ZipCode", Int64.Type}, {"Email Name", type text}, {"City", type text}, {"State", type text}, {"Region", type text}, {"District", type text}, {"Country", type text}}),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Changed Type",{"ProductID", "Units", "Product", "Category", "Segment", "ManufacturerID", "Manufacturer", "Unit Cost", "Unit Price"}),
+				    #"Removed Duplicates" = Table.Distinct(#"Removed Other Columns"),
+				    #"Sorted Rows" = Table.Sort(#"Removed Duplicates",{{"ProductID", Order.Ascending}}),
+				    #"Removed Other Columns1" = Table.SelectColumns(#"Sorted Rows",{"Category", "Segment"}),
+				    #"Removed Duplicates1" = Table.Distinct(#"Removed Other Columns1"),
+				    #"Added Index" = Table.AddIndexColumn(#"Removed Duplicates1", "Index", 1, 1, Int64.Type),
+				    #"Reordered Columns" = Table.ReorderColumns(#"Added Index",{"Index", "Category", "Segment"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Reordered Columns",{{"Index", "CatSegID"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

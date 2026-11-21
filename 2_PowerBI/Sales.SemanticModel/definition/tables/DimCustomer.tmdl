@@ -1,0 +1,70 @@
+table DimCustomer
+	lineageTag: 3825c088-14f7-4908-afb5-2ff870941082
+
+	column CustomerID
+		dataType: int64
+		formatString: 0
+		lineageTag: 8ac6d5b1-9ecc-475f-8e8f-701b7f5802c9
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ZipCode
+		dataType: string
+		lineageTag: cbce924a-3092-4287-8c88-28fae2b11bde
+		summarizeBy: none
+		sourceColumn: ZipCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Email
+		dataType: string
+		lineageTag: cd35bd0b-9813-4055-9fb4-492c5cf9ceea
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Last Name'
+		dataType: string
+		lineageTag: f1345eea-67cf-4010-a5c9-45acf20a41a1
+		summarizeBy: none
+		sourceColumn: Last Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'First Name'
+		dataType: string
+		lineageTag: 0c2729bd-a6c9-4d1e-b0ff-fe189be989de
+		summarizeBy: none
+		sourceColumn: First Name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimCustomer-9a178d39-effb-4cba-8425-8342a3a9a37e = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\LWTN Data Modeling\StudentFiles\Sales.csv"),[Delimiter=",", Columns=19, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductID", Int64.Type}, {"Date", type datetime}, {"CustomerID", Int64.Type}, {"CampaignID", Int64.Type}, {"Units", Int64.Type}, {"Product", type text}, {"Category", type text}, {"Segment", type text}, {"ManufacturerID", Int64.Type}, {"Manufacturer", type text}, {"Unit Cost", type number}, {"Unit Price", type number}, {"ZipCode", type text}, {"Email Name", type text}, {"City", type text}, {"State", type text}, {"Region", type text}, {"District", type text}, {"Country", type text}}),
+				    #"Removed Other Columns" = Table.SelectColumns(#"Changed Type",{"CustomerID", "ZipCode", "Email Name"}),
+				    #"Split Column by Delimiter" = Table.SplitColumn(#"Removed Other Columns", "Email Name", Splitter.SplitTextByDelimiter(":", QuoteStyle.Csv), {"Email Name.1", "Email Name.2"}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Split Column by Delimiter",{{"Email Name.1", type text}, {"Email Name.2", type text}}),
+				    #"Trimmed Text" = Table.TransformColumns(#"Changed Type1",{{"Email Name.2", Text.Trim, type text}}),
+				    #"Split Column by Delimiter1" = Table.SplitColumn(#"Trimmed Text", "Email Name.2", Splitter.SplitTextByDelimiter(", ", QuoteStyle.Csv), {"Email Name.2.1", "Email Name.2.2"}),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Split Column by Delimiter1",{{"Email Name.2.1", type text}, {"Email Name.2.2", type text}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type2",{{"Email Name.2.1", "Last Name"}, {"Email Name.2.2", "First Name"}}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Renamed Columns","(","",Replacer.ReplaceText,{"Email Name.1"}),
+				    #"Replaced Value1" = Table.ReplaceValue(#"Replaced Value",")","",Replacer.ReplaceText,{"Email Name.1"}),
+				    #"Renamed Columns1" = Table.RenameColumns(#"Replaced Value1",{{"Email Name.1", "Email"}}),
+				    #"Sorted Rows" = Table.Sort(#"Renamed Columns1",{{"CustomerID", Order.Ascending}}),
+				    #"Removed Duplicates" = Table.Distinct(#"Sorted Rows")
+				in
+				    #"Removed Duplicates"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

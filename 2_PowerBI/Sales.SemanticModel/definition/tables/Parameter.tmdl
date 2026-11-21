@@ -1,0 +1,49 @@
+table Parameter
+	lineageTag: 78030f23-fe64-43e1-aed8-28ad17cbc641
+
+	column Parameter
+		lineageTag: 51447288-0388-42d6-a8ab-95fe39f0fd4d
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Parameter Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Parameter Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parameter Fields'
+		isHidden
+		lineageTag: 9830108b-b633-43b2-bb27-d36b9e4efb9d
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Parameter Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Parameter Order'
+		isHidden
+		formatString: 0
+		lineageTag: 7910c325-436a-4643-9c19-9a2ebd5f1ccf
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Parameter = calculated
+		mode: import
+		source =
+				{
+				    ("Year", NAMEOF('DimDate'[Year]), 0),
+				    ("Category", NAMEOF('DimCatSeg'[Category]), 1),
+				    ("Region", NAMEOF('DimGeography'[Region]), 2)
+				}
+
+	annotation PBI_Id = 1292f85bfde246d6b6a0d5a0ee481ee3
+
