@@ -50,7 +50,8 @@ BEGIN
     SET XACT_ABORT ON;
     DECLARE @StartTime AS DATETIME = GETDATE();
     DECLARE @ProcessName AS VARCHAR (100) = 'Load_DimCustomer_SCD2';
-    DECLARE @RowsAffected AS INT = 0;
+    DECLARE @UpdatedRows AS INT = 0;
+    DECLARE @InsertedRows AS INT = 0;
     DECLARE @LogID AS INT;
     -- 1. Log Process Start
     INSERT  INTO dbo.ETL_ExecutionLog (
@@ -98,6 +99,7 @@ BEGIN
         WHERE  Target.IsCurrent = 1
                AND (Target.FullName <> Source.FullName
                     OR ISNULL(Target.ModifiedDate, '1900-01-01') <> ISNULL(Source.ModifiedDate, '1900-01-01'));
+        SET @UpdatedRows = @@ROWCOUNT;
         -- Step B: INSERT new records (Brand new customers + newly expired versions)
         INSERT INTO dbo.DimCustomer_Local (
             CustomerID,
@@ -126,13 +128,15 @@ BEGIN
                                   AND Target.IsCurrent = 1
                                   AND Target.FullName = Source.FullName
                                   AND ISNULL(Target.ModifiedDate, '1900-01-01') = ISNULL(Source.ModifiedDate, '1900-01-01'));
-        SET @RowsAffected = @@ROWCOUNT;
+        SET @InsertedRows = @@ROWCOUNT;
         COMMIT TRANSACTION;
         -- 4. Log Process Success
         UPDATE dbo.ETL_ExecutionLog
         SET    ExecutionEndTime = GETDATE(),
                Status           = 'SUCCESS',
-               RowsAffected     = @RowsAffected
+               InsertedRows     = @InsertedRows,
+               UpdatedRows      = @UpdatedRows,
+               RowsAffected     = @UpdatedRows + @InsertedRows
         WHERE  LogID = @LogID;
     END TRY
     BEGIN CATCH
@@ -158,9 +162,8 @@ EXECUTE dbo.usp_RunCustomerETL ;
 SELECT COUNT(*) AS TotalRows
 FROM   dbo.DimCustomer_Local;
 
+SELECT TOP 3 *
+FROM   dbo.DimCustomer_Local;
+
 SELECT *
 FROM   dbo.ETL_ExecutionLog;
-
-
--- Drop table dbo.DimCustomer_Local;
--- drop table dbo.ETL_ExecutionLog;

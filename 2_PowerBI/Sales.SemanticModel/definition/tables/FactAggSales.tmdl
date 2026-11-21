@@ -1,0 +1,49 @@
+table FactAggSales
+	lineageTag: 1d3a1427-9265-4b6d-8fbf-02ece0dad1c6
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 518752e0-d025-4231-8564-7f52df19839c
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column TotalSales
+		dataType: double
+		lineageTag: 311dd5fb-4249-4a22-badb-0abb7e124653
+		summarizeBy: sum
+		sourceColumn: TotalSales
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TotalTransactions
+		dataType: int64
+		formatString: 0
+		lineageTag: cb4858fe-cc0d-47ed-8a0a-899a6f7cca97
+		summarizeBy: sum
+		sourceColumn: TotalTransactions
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FactAggSales-449bcb0a-2ccf-4b14-abc9-b1533f8d86a7 = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\LWTN Data Modeling\StudentFiles\Sales.csv"),[Delimiter=",", Columns=19, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductID", Int64.Type}, {"Date", type datetime}, {"CustomerID", Int64.Type}, {"CampaignID", Int64.Type}, {"Units", Int64.Type}, {"Product", type text}, {"Category", type text}, {"Segment", type text}, {"ManufacturerID", Int64.Type}, {"Manufacturer", type text}, {"Unit Cost", type number}, {"Unit Price", type number}, {"ZipCode", Int64.Type}, {"Email Name", type text}, {"City", type text}, {"State", type text}, {"Region", type text}, {"District", type text}, {"Country", type text}}),
+				    #"Grouped Rows" = Table.Group(#"Changed Type", {"Date"}, {{"TotalSales", each List.Sum([Unit Price]), type nullable number}, {"TotalTransactions", each Table.RowCount(_), Int64.Type}}),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Grouped Rows",{{"Date", type date}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
