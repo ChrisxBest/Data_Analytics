@@ -1,5 +1,5 @@
 -- ==========================================================
--- SCRIPT: Full FactInternetSales Enterprise ETL Pipeline (Fixed Columns)
+-- SCRIPT: FactInternetSales Enterprise ETL Pipeline (Idempotent Full Load)
 -- ==========================================================
 USE AdventureWorksDW2025;
 
@@ -8,6 +8,7 @@ GO
 -- ----------------------------------------------------------
 -- 1. Create Staging & Fact Tables (Idempotent)
 -- ----------------------------------------------------------
+-- Staging Table (Transient Raw Data Layer - Full Load)
 IF OBJECT_ID('dbo.Staging_InternetSales', 'U') IS NOT NULL
     DROP TABLE dbo.Staging_InternetSales;
 
@@ -39,10 +40,11 @@ CREATE TABLE dbo.Staging_InternetSales (
 
 
 GO
+-- Target Fact Table (Persistent DWH Layer)
 IF OBJECT_ID('dbo.FactInternetSales_Local', 'U') IS NULL
     BEGIN
         CREATE TABLE dbo.FactInternetSales_Local (
-            SalesSaleKey          INT           IDENTITY (1, 1) PRIMARY KEY,
+            InternetSalesKey      INT           IDENTITY (1, 1) PRIMARY KEY,
             ProductKey            INT           NULL,
             OrderDateKey          INT           NOT NULL,
             DueDateKey            INT           NOT NULL,
@@ -52,7 +54,7 @@ IF OBJECT_ID('dbo.FactInternetSales_Local', 'U') IS NULL
             CurrencyKey           INT           NOT NULL,
             SalesTerritoryKey     INT           NOT NULL,
             SalesOrderNumber      NVARCHAR (25) NOT NULL,
-            SalesOrderLineNumber  INT           NOT NULL, -- In DWH behalten wir den Standardnamen für das Schema bei
+            SalesOrderLineNumber  INT           NOT NULL, -- Maps SalesOrderDetailID to line number in the DWH
             RevisionNumber        TINYINT       NOT NULL,
             OrderQuantity         SMALLINT      NOT NULL,
             UnitPrice             MONEY         NOT NULL,
@@ -76,7 +78,7 @@ IF OBJECT_ID('dbo.FactInternetSales_Local', 'U') IS NULL
 
 GO
 -- ----------------------------------------------------------
--- 2. Create Stored Procedure for the Full Fact ETL Load
+-- 2. Create or Update Fact ETL Stored Procedure
 -- ----------------------------------------------------------
 CREATE OR ALTER PROCEDURE dbo.usp_RunFactInternetSalesETL
 AS
@@ -85,7 +87,8 @@ BEGIN
     SET XACT_ABORT ON;
     DECLARE @StartTime AS DATETIME = GETDATE();
     DECLARE @ProcessName AS VARCHAR (100) = 'Load_FactInternetSales_Full';
-    DECLARE @RowsAffected AS INT = 0;
+    DECLARE @InsertedRows AS INT = 0;
+    DECLARE @UpdatedRows AS INT = 0;
     DECLARE @LogID AS INT;
     -- 1. Log Process Start
     INSERT  INTO dbo.ETL_ExecutionLog (
@@ -122,7 +125,7 @@ BEGIN
             ShipDate
         )
         SELECT oh.SalesOrderID,
-               od.SalesOrderDetailID, -- Korrekt aus der OLTP-Tabelle übernommen
+               od.SalesOrderDetailID,
                oh.CustomerID,
                od.ProductID,
                od.SpecialOfferID,
@@ -157,8 +160,10 @@ BEGIN
                ON od.ProductID = pr.ProductID
         WHERE  oh.OnlineOrderFlag = 1
                AND p.PersonType = 'IN';
-        -- 3. TRANSFORM & LOAD
+        -- 3. TRANSFORM & LOAD (Transactional reload for idempotent re-runs)
         BEGIN TRANSACTION;
+        -- Clear existing target rows inside the transaction so re-runs stay idempotent and rollback-safe
+        DELETE dbo.FactInternetSales_Local;
         INSERT INTO dbo.FactInternetSales_Local (
             ProductKey,
             OrderDateKey,
@@ -185,18 +190,19 @@ BEGIN
             CustomerPONumber,
             OrderDate,
             DueDate,
-            ShipDate
+            ShipDate,
+            ETL_CreatedAt
         )
         SELECT NULL AS ProductKey,
-               CAST (FORMAT(stg.OrderDate, 'yyyyMMdd') AS INT) AS OrderDateKey,
-               CAST (FORMAT(stg.DueDate, 'yyyyMMdd') AS INT) AS DueDateKey,
-               CAST (FORMAT(stg.ShipDate, 'yyyyMMdd') AS INT) AS ShipDateKey,
+               CONVERT (INT, CONVERT (VARCHAR (8), stg.OrderDate, 112)) AS OrderDateKey,
+               CONVERT (INT, CONVERT (VARCHAR (8), stg.DueDate, 112)) AS DueDateKey,
+               CONVERT (INT, CONVERT (VARCHAR (8), stg.ShipDate, 112)) AS ShipDateKey,
                dc.CustomerKey,
                ISNULL(stg.SpecialOfferID, 1) AS PromotionKey,
                ISNULL(stg.CurrencyRateID, 1) AS CurrencyKey,
                ISNULL(stg.TerritoryID, 1) AS SalesTerritoryKey,
                stg.SalesOrderNumber,
-               stg.SalesOrderDetailID AS SalesOrderLineNumber, -- Mappt die ID auf die Zeilennummer im DWH
+               stg.SalesOrderDetailID AS SalesOrderLineNumber,
                stg.RevisionNumber,
                stg.OrderQty AS OrderQuantity,
                stg.UnitPrice,
@@ -212,7 +218,8 @@ BEGIN
                stg.CustomerPONumber,
                stg.OrderDate,
                stg.DueDate,
-               stg.ShipDate
+               stg.ShipDate,
+               GETDATE() AS ETL_CreatedAt
         FROM   dbo.Staging_InternetSales AS stg
                INNER JOIN
                dbo.DimCustomer_Local AS dc
@@ -220,13 +227,15 @@ BEGIN
                   AND stg.OrderDate >= dc.ValidFrom
                   AND (stg.OrderDate < dc.ValidTo
                        OR dc.ValidTo IS NULL);
-        SET @RowsAffected = @@ROWCOUNT;
+        SET @InsertedRows = @@ROWCOUNT;
         COMMIT TRANSACTION;
         -- 4. Log Process Success
         UPDATE dbo.ETL_ExecutionLog
         SET    ExecutionEndTime = GETDATE(),
                Status           = 'SUCCESS',
-               RowsAffected     = @RowsAffected
+               InsertedRows     = @InsertedRows,
+               UpdatedRows      = @UpdatedRows,
+               RowsAffected     = @InsertedRows + @UpdatedRows
         WHERE  LogID = @LogID;
     END TRY
     BEGIN CATCH
@@ -252,8 +261,8 @@ EXECUTE dbo.usp_RunFactInternetSalesETL ;
 SELECT COUNT(*) AS TotalRows
 FROM   dbo.FactInternetSales_Local;
 
+SELECT TOP 3 *
+FROM   dbo.FactInternetSales_Local;
+
 SELECT *
 FROM   dbo.ETL_ExecutionLog;
-
--- Drop table dbo.FactInternetSales_Local;
--- drop table dbo.ETL_ExecutionLog;
