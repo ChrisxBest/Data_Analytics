@@ -1,5 +1,3 @@
----
-
 ## 1. Data Architecture & ETL Pipeline (`1_ETL/`)
 
 The data warehouse follows a classic **Star Schema** design with an upstream staging layer to cleanse source data and optimize analytical query performance.
