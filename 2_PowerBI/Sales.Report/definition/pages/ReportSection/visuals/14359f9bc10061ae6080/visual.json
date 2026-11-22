@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "14359f9bc10061ae6080",
   "position": {
-    "x": 1000.0053255225669,
-    "y": 193.86606310744241,
+    "x": 976.69231793369727,
+    "y": 182.82305951271468,
     "z": 1000,
-    "height": 235.58407668752497,
-    "width": 279.75609106643589,
+    "height": 126.38104113966183,
+    "width": 303.06909865530554,
     "tabOrder": 1000
   },
   "visual": {
@@ -23,11 +23,11 @@
                       "Entity": "FactSales"
                     }
                   },
-                  "Property": "Total Sales"
+                  "Property": "Current Year Sales"
                 }
               },
-              "queryRef": "FactSales.Total Sales",
-              "nativeQueryRef": "Total Sales"
+              "queryRef": "FactSales.Current Year Sales",
+              "nativeQueryRef": "Current Year Sales"
             }
           ]
         },

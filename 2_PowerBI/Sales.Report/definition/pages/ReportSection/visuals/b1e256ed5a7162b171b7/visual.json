@@ -3,11 +3,11 @@
   "name": "b1e256ed5a7162b171b7",
   "position": {
     "x": 539.88017574224466,
-    "y": 440.49314338969509,
-    "z": 5000,
-    "height": 279.75609106643589,
-    "width": 460.1251497803222,
-    "tabOrder": 5000
+    "y": 429.45013979496741,
+    "z": 4000,
+    "height": 290.79909466116362,
+    "width": 739.88124084675815,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "clusteredColumnChart",
@@ -233,51 +233,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "74d70005396bdeefd30d",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "DimCatSeg"
-              }
-            },
-            "Property": "Category"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "ecd04592aff71d4095bd",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "FactSales"
-              }
-            },
-            "Property": "Total Cost"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "a2ff3064b44f601894ff",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "FactSales"
-              }
-            },
-            "Property": "Total Sales"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

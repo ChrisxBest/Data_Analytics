@@ -9,7 +9,7 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 0
 
-annotation PBI_QueryOrder = ["FactSales","Query1","DimDate","DimGeography","DimCustomer","DimProduct","BudgetFact_Data","FactBudget","DimCatSeg","FactAggSales"]
+annotation PBI_QueryOrder = ["FactSales","Query1","DimDate","DimGeography","DimCustomer","DimProduct","BudgetFact_Data","FactBudget","DimCatSeg","FactAggSales","ETL_ExecutionLog"]
 
 annotation __TEdtr = 1
 
@@ -24,7 +24,8 @@ ref table FactBudget
 ref table DimCatSeg
 ref table FactAggSales
 ref table 'Time Intelligence'
-ref table Parameter
+ref table 'Field Params'
+ref table ETL_ExecutionLog
 
 ref cultureInfo en-US
 

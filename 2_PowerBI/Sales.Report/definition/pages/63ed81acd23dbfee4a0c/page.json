@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
-  "name": "2671f899bb0c5f0bbbd3",
-  "displayName": "Order vs Ship",
+  "name": "63ed81acd23dbfee4a0c",
+  "displayName": "ETL Exec Log",
   "displayOption": "FitToPage",
   "height": 720,
   "width": 1280
