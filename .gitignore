@@ -16,6 +16,7 @@
 *.ldf
 *.ndf
 *.log
+*.pbix
 
 # Local data dumps / exports (uncomment to exclude large raw data files)
 # *.csv
