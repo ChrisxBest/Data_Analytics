@@ -1,0 +1,150 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "3e8482d863cb6f46bc7e",
+  "position": {
+    "x": 0,
+    "y": 0,
+    "z": 0,
+    "height": 279.890937559053,
+    "width": 1280.0345544367356,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ETL_ExecutionLog"
+                    }
+                  },
+                  "Property": "LogID"
+                }
+              },
+              "queryRef": "ETL_ExecutionLog.LogID",
+              "nativeQueryRef": "LogID"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ETL_ExecutionLog"
+                    }
+                  },
+                  "Property": "ProcessName"
+                }
+              },
+              "queryRef": "ETL_ExecutionLog.ProcessName",
+              "nativeQueryRef": "ProcessName"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ETL_ExecutionLog"
+                    }
+                  },
+                  "Property": "ExecutionStartTime"
+                }
+              },
+              "queryRef": "ETL_ExecutionLog.ExecutionStartTime",
+              "nativeQueryRef": "ExecutionStartTime"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ETL_ExecutionLog"
+                    }
+                  },
+                  "Property": "ExecutionEndTime"
+                }
+              },
+              "queryRef": "ETL_ExecutionLog.ExecutionEndTime",
+              "nativeQueryRef": "ExecutionEndTime"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ETL_ExecutionLog"
+                    }
+                  },
+                  "Property": "InsertedRows"
+                }
+              },
+              "queryRef": "ETL_ExecutionLog.InsertedRows",
+              "nativeQueryRef": "InsertedRows"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ETL_ExecutionLog"
+                    }
+                  },
+                  "Property": "UpdatedRows"
+                }
+              },
+              "queryRef": "ETL_ExecutionLog.UpdatedRows",
+              "nativeQueryRef": "UpdatedRows"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ETL_ExecutionLog"
+                    }
+                  },
+                  "Property": "RowsAffected"
+                }
+              },
+              "queryRef": "ETL_ExecutionLog.RowsAffected",
+              "nativeQueryRef": "RowsAffected"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ETL_ExecutionLog"
+                    }
+                  },
+                  "Property": "Status"
+                }
+              },
+              "queryRef": "ETL_ExecutionLog.Status",
+              "nativeQueryRef": "Status"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "ETL_ExecutionLog"
+                    }
+                  },
+                  "Property": "ErrorMessage"
+                }
+              },
+              "queryRef": "ETL_ExecutionLog.ErrorMessage",
+              "nativeQueryRef": "ErrorMessage"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

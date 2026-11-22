@@ -6,7 +6,7 @@ table 'Time Intelligence'
 
 		calculationItem TOTAL = SELECTEDMEASURE()
 
-		calculationItem 'Vorjahr (PY)' =
+		calculationItem YoY =
 				CALCULATE(
 				    SELECTEDMEASURE(),
 				    SAMEPERIODLASTYEAR('DimDate'[Date])
@@ -40,7 +40,7 @@ table 'Time Intelligence'
 
 			formatStringDefinition = "+0.0%;-0.0%;0.0%"
 
-	column Name
+	column 'Calc Group'
 		dataType: string
 		lineageTag: bfa27bd4-99a8-40a5-8e72-771f7cfba1a9
 		sourceColumn: Name

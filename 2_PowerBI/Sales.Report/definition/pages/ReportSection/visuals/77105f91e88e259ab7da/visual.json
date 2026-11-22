@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "77105f91e88e259ab7da",
   "position": {
-    "x": 1000.0053255225669,
-    "y": 451.53614698442283,
+    "x": 976.69231793369727,
+    "y": 309.2041006523765,
     "z": 3000,
-    "height": 268.71308747170815,
-    "width": 279.75609106643589,
+    "height": 120.24603914259087,
+    "width": 303.06909865530554,
     "tabOrder": 3000
   },
   "visual": {
@@ -23,11 +23,11 @@
                       "Entity": "FactSales"
                     }
                   },
-                  "Property": "Total Cost"
+                  "Property": "Current Year Costs"
                 }
               },
-              "queryRef": "FactSales.Total Cost",
-              "nativeQueryRef": "Total Cost"
+              "queryRef": "FactSales.Current Year Costs",
+              "nativeQueryRef": "Current Year Costs"
             }
           ]
         },

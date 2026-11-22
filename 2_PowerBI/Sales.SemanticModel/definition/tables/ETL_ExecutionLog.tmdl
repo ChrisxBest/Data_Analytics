@@ -1,0 +1,90 @@
+table ETL_ExecutionLog
+	lineageTag: 2ab064c1-d011-4ae1-9a65-642e6d3a238c
+
+	column LogID
+		dataType: int64
+		formatString: 0
+		lineageTag: a053388a-02e0-4cf1-9256-79e666764e8d
+		summarizeBy: count
+		sourceColumn: LogID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProcessName
+		dataType: string
+		lineageTag: 3b793de2-885c-4d9b-afef-8dd04f71be31
+		summarizeBy: none
+		sourceColumn: ProcessName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ExecutionStartTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 8562da81-6ddf-4de4-9559-9f68f8f88ff2
+		summarizeBy: none
+		sourceColumn: ExecutionStartTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column ExecutionEndTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 3e6c1fc6-b363-4fcf-9bd2-406605f0ac4d
+		summarizeBy: none
+		sourceColumn: ExecutionEndTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: d0f1102e-410b-4c94-bb10-cee7a5d0e845
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column InsertedRows
+		dataType: int64
+		formatString: 0
+		lineageTag: b26c9027-a3b5-4311-8a06-730a61b2e2e9
+		summarizeBy: sum
+		sourceColumn: InsertedRows
+
+		annotation SummarizationSetBy = Automatic
+
+	column UpdatedRows
+		dataType: int64
+		formatString: 0
+		lineageTag: bdf59f6c-f1f4-463c-a350-591ddb1ba275
+		summarizeBy: sum
+		sourceColumn: UpdatedRows
+
+		annotation SummarizationSetBy = Automatic
+
+	column RowsAffected
+		dataType: int64
+		formatString: 0
+		lineageTag: 55417de6-0077-46e3-b9ca-24fa8bece55a
+		summarizeBy: sum
+		sourceColumn: RowsAffected
+
+		annotation SummarizationSetBy = Automatic
+
+	column ErrorMessage
+		dataType: string
+		lineageTag: 7dff737e-106b-4e1d-9c6b-c586a8f21473
+		summarizeBy: none
+		sourceColumn: ErrorMessage
+
+		annotation SummarizationSetBy = Automatic
+
+	partition ETL_ExecutionLog = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database("localhost", "AdventureWorksDW2025"),
+				    dbo_ETL_ExecutionLog = Source{[Schema="dbo",Item="ETL_ExecutionLog"]}[Data]
+				in
+				    dbo_ETL_ExecutionLog
+

@@ -33,12 +33,49 @@ table FactSales
 			
 			CALCULATE(
 			    [Total Sales],
-			    USERELATIONSHIP('DimDate'[Date], 'FactSales'[ShipDate])
+			    USERELATIONSHIP('FactSales'[ShipDate], 'DimDate'[Date])
 			)
-		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
-		lineageTag: 57e8396c-9b81-4579-afdc-fa04bf7bf235
+		lineageTag: f0a56dfc-811b-43f3-b393-5d39acbe0687
 
-		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Current Year Sales' = ```
+			
+			VAR MaxYearSales = 
+			    CALCULATE(
+			        MAX('FactSales'[OrderDate]), -- oder 'DimDate'[Year]
+			        REMOVEFILTERS('DimDate')
+			    )
+			VAR MaxYear = YEAR(MaxYearSales)
+			RETURN
+			CALCULATE(
+			    [Total Sales],
+			    REMOVEFILTERS('DimDate'[Year]),
+			    'DimDate'[Year] = MaxYear
+			)
+			```
+		lineageTag: 30a90c29-a58e-403c-abc6-2f5e4b4487b7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Current Year Costs' = ```
+			
+			VAR MaxYearCosts = 
+			    CALCULATE(
+			        MAX('FactSales'[OrderDate]), -- oder 'DimDate'[Year]
+			        REMOVEFILTERS('DimDate')
+			    )
+			VAR MaxYear = YEAR(MaxYearCosts)
+			RETURN
+			CALCULATE(
+			    [Total Cost],
+			    REMOVEFILTERS('DimDate'[Year]),
+			    'DimDate'[Year] = MaxYear
+			)
+			```
+		lineageTag: b8b1d3c7-8b26-4b53-b878-901efc2015ea
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column ProductID
 		dataType: int64

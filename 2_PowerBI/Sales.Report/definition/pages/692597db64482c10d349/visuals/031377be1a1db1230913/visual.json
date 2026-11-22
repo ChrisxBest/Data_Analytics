@@ -6,7 +6,7 @@
     "y": 0,
     "z": 0,
     "height": 720.2526793186297,
-    "width": 1280.0345544367356,
+    "width": 1043.6822071646466,
     "tabOrder": 0
   },
   "visual": {
@@ -23,7 +23,7 @@
                       "Entity": "Time Intelligence"
                     }
                   },
-                  "Property": "Name"
+                  "Property": "Calc Group"
                 }
               },
               "queryRef": "Time Intelligence.Name",
@@ -171,7 +171,7 @@
                   "color": {
                     "expr": {
                       "Literal": {
-                        "Value": "'#37F05F'"
+                        "Value": "'maxColor'"
                       }
                     }
                   }

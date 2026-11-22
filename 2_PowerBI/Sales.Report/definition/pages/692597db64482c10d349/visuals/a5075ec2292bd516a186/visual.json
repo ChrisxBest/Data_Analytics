@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
-  "name": "11516fa534ecabb4f512",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "a5075ec2292bd516a186",
   "position": {
-    "x": 1000.109062440947,
-    "y": 0,
-    "z": 1,
-    "height": 90.809059741381631,
-    "width": 279.890937559053,
-    "tabOrder": 1
+    "x": 1043.6476527279108,
+    "y": 90.809059741381631,
+    "z": 2,
+    "height": 92.05301946386632,
+    "width": 236.35234727208919,
+    "tabOrder": 2
   },
   "visual": {
     "visualType": "slicer",
@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "DimDate"
+                      "Entity": "DimGeography"
                     }
                   },
-                  "Property": "Year"
+                  "Property": "State"
                 }
               },
-              "queryRef": "DimDate.Year",
-              "nativeQueryRef": "Year",
+              "queryRef": "DimGeography.State",
+              "nativeQueryRef": "State",
               "active": true
             }
           ]
@@ -169,7 +169,7 @@
       ]
     },
     "syncGroup": {
-      "groupName": "Year",
+      "groupName": "State",
       "fieldChanges": true,
       "filterChanges": true
     },
